@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FuadBot Chat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="chatbot.css" />
+</head>
+<body>
+
+  <!-- Decorative bubbles - moved to top -->
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+
+  <div class="chat-container">
+    <h1>💬 FuadBot</h1>
+    <p class="intro-text">
+      Welcome to FuadBot — your AI assistant for all things Fuad Khan!<br />
+      Ask about his skills, projects, education, or just say hi.<br />
+      Type your message below and hit send or press Enter.
+    </p>
+    <div id="chatlogs" class="chat-logs"></div>
+
+    <div class="chat-controls">
+      <input type="text" id="chat-input" placeholder="Type your message..." />
+      <button id="send-btn"><i class="fas fa-paper-plane"></i> Send</button>
+      <button id="reset-btn" class="reset-btn"><i class="fas fa-redo"></i> Reset</button>
+    </div>
+  </div>
+
+  <!-- Cute AI Assistant -->
+  <div class="ai-assistant">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="FuadBot Avatar" onload="this.classList.add('loaded')">
+  </div>
+
+  <script src="chatbot.js"></script>
+</body>
+</html>
