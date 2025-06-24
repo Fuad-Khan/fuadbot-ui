@@ -8,9 +8,9 @@ FuadBot is a Gen-Z-style AI chatbot built by **Fuad Khan**, a Software Engineeri
 
 ## 🖼️ Screenshot
 
-![FuadBot Screenshot](images/Screenshot 2025-06-24 225634.png)
+![FuadBot Screenshot](images/Screenshot.png)
 
-> 💡 Tip: You can replace this with your actual screenshot URL from your project or GitHub repo!
+
 
 ---
 
