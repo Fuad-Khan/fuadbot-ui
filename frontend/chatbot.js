@@ -1,27 +1,34 @@
+const API_URL = "https://fuadbot-api.onrender.com"; // 🌐 Your Render backend URL
+
 const chatLogs = document.getElementById('chatlogs');
 const chatInput = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
 const resetBtn = document.getElementById('reset-btn');
 
+// Send message on button click
 sendBtn.addEventListener('click', sendMessage);
+
+// Send message on Enter key
 chatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault(); // prevent newline
+    e.preventDefault(); // prevent new line
     sendMessage();
   }
 });
 
+// Reset button clears chat + backend memory
 resetBtn.addEventListener('click', async () => {
   chatLogs.innerHTML = '';
   appendMessage("System", "🧼 Chat has been reset.");
 
   try {
-    await fetch("http://localhost:5000/reset", { method: "POST" });
+    await fetch(`${API_URL}/reset`, { method: "POST" });
   } catch (err) {
     console.error("Reset failed:", err);
   }
 });
 
+// Main send logic
 async function sendMessage() {
   const userMessage = chatInput.value.trim();
   if (!userMessage) return;
@@ -32,7 +39,7 @@ async function sendMessage() {
   const fullMessage = userMessage + " (Answer briefly and only what is asked.)";
 
   try {
-    const response = await fetch("http://localhost:5000/chat", {
+    const response = await fetch(`${API_URL}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: fullMessage })
@@ -46,6 +53,7 @@ async function sendMessage() {
   }
 }
 
+// Renders chat messages with markdown formatting
 function appendMessage(sender, message) {
   const msg = document.createElement('div');
   msg.innerHTML = `<strong>${sender}:</strong> ${markdownToHTML(message)}`;
@@ -53,17 +61,15 @@ function appendMessage(sender, message) {
   chatLogs.scrollTop = chatLogs.scrollHeight;
 }
 
-// Enhanced simple markdown converter with list support
+// Markdown converter (bold, italic, list, line breaks)
 function markdownToHTML(text) {
-  // Escape HTML tags for safety (optional, if you want raw HTML blocked)
+  // Optional: escape HTML for safety
   // text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-  // Convert bold and italic first
   let html = text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
     .replace(/\*(.*?)\*/g, '<em>$1</em>');             // italic
 
-  // Split into lines to handle lists and line breaks
   const lines = html.split('\n');
   let inList = false;
   let result = '';
@@ -80,15 +86,11 @@ function markdownToHTML(text) {
         inList = false;
         result += '</ul>';
       }
-      // Replace line breaks except after last line
       result += line;
-      if (index !== lines.length -1) result += '<br>';
+      if (index !== lines.length - 1) result += '<br>';
     }
   });
 
-  if (inList) {
-    result += '</ul>';
-  }
-
+  if (inList) result += '</ul>';
   return result;
 }
