@@ -35,6 +35,14 @@ async function sendMessage() {
 
   appendMessage("You", userMessage);
   chatInput.value = "";
+  chatInput.focus(); // Autofocus after sending
+
+  // Typing indicator
+  const loadingMsg = document.createElement('div');
+  loadingMsg.classList.add('loading-msg');
+  loadingMsg.innerHTML = `<strong>FuadBot:</strong> ⏳ Typing...`;
+  chatLogs.appendChild(loadingMsg);
+  chatLogs.scrollTop = chatLogs.scrollHeight;
 
   const fullMessage = userMessage + " (Answer briefly and only what is asked.)";
 
@@ -46,14 +54,16 @@ async function sendMessage() {
     });
 
     const data = await response.json();
+    chatLogs.removeChild(loadingMsg); // Remove typing msg
     appendMessage("FuadBot", data.reply);
   } catch (err) {
+    chatLogs.removeChild(loadingMsg);
     appendMessage("Error", "Something went wrong 😥");
     console.error(err);
   }
 }
 
-// Renders chat messages with markdown formatting
+// Renders chat messages with markdown formatting + clickable links
 function appendMessage(sender, message) {
   const msg = document.createElement('div');
   msg.innerHTML = `<strong>${sender}:</strong> ${markdownToHTML(message)}`;
@@ -61,15 +71,20 @@ function appendMessage(sender, message) {
   chatLogs.scrollTop = chatLogs.scrollHeight;
 }
 
-// Markdown converter (bold, italic, list, line breaks)
+// Markdown converter: bold, italic, list, links
 function markdownToHTML(text) {
-  // Optional: escape HTML for safety
-  // text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Escape HTML for safety
+  text = text.replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;");
 
+  // Apply basic markdown
   let html = text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
-    .replace(/\*(.*?)\*/g, '<em>$1</em>');             // italic
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')             // italic
+    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'); // links
 
+  // Handle lists + line breaks
   const lines = html.split('\n');
   let inList = false;
   let result = '';
