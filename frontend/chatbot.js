@@ -1,4 +1,4 @@
-const API_URL = "https://fuadbot-api.onrender.com"; // 🌐 Your Render backend URL
+const API_URL = "https://fuadbot-api-1.onrender.com"; // 🌐 Your Render backend URL
 
 const chatLogs = document.getElementById('chatlogs');
 const chatInput = document.getElementById('chat-input');
