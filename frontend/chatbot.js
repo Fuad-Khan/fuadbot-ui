@@ -1,4 +1,8 @@
-const API_URL = "https://fuadbot-api.onrender.com/"; // 🌐 Your Render backend URL
+// 🌐 Backend URL
+// Local dev:
+// const API_URL = "http://127.0.0.1:5000";
+// When deploying, switch to:
+const API_URL = "https://fuadbot-api.onrender.com";
 
 const chatLogs = document.getElementById('chatlogs');
 const chatInput = document.getElementById('chat-input');
@@ -8,15 +12,15 @@ const resetBtn = document.getElementById('reset-btn');
 // Send message on button click
 sendBtn.addEventListener('click', sendMessage);
 
-// Send message on Enter key
+// Send message on Enter key (no Shift)
 chatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault(); // prevent new line
+    e.preventDefault();
     sendMessage();
   }
 });
 
-// Reset button clears chat + backend memory
+// Reset button clears chat + ping backend /reset
 resetBtn.addEventListener('click', async () => {
   chatLogs.innerHTML = '';
   appendMessage("System", "🧼 Chat has been reset.");
@@ -35,7 +39,7 @@ async function sendMessage() {
 
   appendMessage("You", userMessage);
   chatInput.value = "";
-  chatInput.focus(); // Autofocus after sending
+  chatInput.focus();
 
   // Typing indicator
   const loadingMsg = document.createElement('div');
@@ -44,18 +48,22 @@ async function sendMessage() {
   chatLogs.appendChild(loadingMsg);
   chatLogs.scrollTop = chatLogs.scrollHeight;
 
-  const fullMessage = userMessage + " (Answer briefly and only what is asked.)";
-
   try {
     const response = await fetch(`${API_URL}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: fullMessage })
+      body: JSON.stringify({ message: userMessage }) // backend adds “answer briefly”
     });
 
     const data = await response.json();
-    chatLogs.removeChild(loadingMsg); // Remove typing msg
-    appendMessage("FuadBot", data.reply);
+    chatLogs.removeChild(loadingMsg);
+
+    if (response.ok && data.reply) {
+      appendMessage("FuadBot", data.reply);
+    } else {
+      appendMessage("Error", data.detail || "Something went wrong 😥");
+      console.error("Backend error:", data);
+    }
   } catch (err) {
     chatLogs.removeChild(loadingMsg);
     appendMessage("Error", "Something went wrong 😥");
@@ -71,20 +79,20 @@ function appendMessage(sender, message) {
   chatLogs.scrollTop = chatLogs.scrollHeight;
 }
 
-// Markdown converter: bold, italic, list, links
+// Markdown converter: bold, italic, links, lists, line breaks
 function markdownToHTML(text) {
-  // Escape HTML for safety
+  // Escape HTML
   text = text.replace(/&/g, "&amp;")
              .replace(/</g, "&lt;")
              .replace(/>/g, "&gt;");
 
-  // Apply basic markdown
+  // Basic markdown
   let html = text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // bold
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')             // italic
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // **bold**
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')             // *italic*
     .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'); // links
 
-  // Handle lists + line breaks
+  // Lists + line breaks
   const lines = html.split('\n');
   let inList = false;
   let result = '';
